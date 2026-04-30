@@ -81,7 +81,7 @@ class MedicalRAG:
             print(f"⚠️ Retrieval error: {e}")
             return []
 
-    def generate(self, query: str) -> str:
+    def generate(self, query: str, history: list[dict] = None) -> str:
         """Retrieve context -> Prompt LLM -> Return safe, grounded response."""
         context_chunks = self.retrieve(query)
         context = "\n\n---\n\n".join(context_chunks) if context_chunks else ""
@@ -98,7 +98,15 @@ class MedicalRAG:
           "⚠️ Disclaimer: I am an AI assistant, not a licensed healthcare professional. This information is for educational purposes only and should not replace professional medical advice, diagnosis, or treatment."
         """
 
-        user_prompt = f"Context:\n{context}\n\nUser Question: {query}"
+        # Maintaining conversation history
+        conversation = ""
+        if history:
+            for msg in history[-4:]:  # Keep last 4 messages to avoid context overflow
+                role = "User" if msg["role"] == "user" else "Assistant"
+                conversation += f"{role}: {msg['content']}\n"
+        
+        user_prompt = f"Context:\n{context}\n\nConversation History:\n{conversation}User Question: {query}"
+
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
