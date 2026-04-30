@@ -1,2 +1,5 @@
 #ignoring dataset
 /knowledge/medquad.csv
+
+#python cache
+/__pycache__
