@@ -70,6 +70,24 @@ class MedicalRAG:
             self.chunks = json.load(f)
         print(f"📚 Loaded index with {len(self.chunks)} chunks.")
 
+    def _is_medical_topic(self, text: str) -> bool:
+        """Check if input is health-related using keyword matching."""
+        medical_keywords = [
+            "headache", "fever", "cold", "cough", "pain", "symptom", "health",
+            "diet", "nutrition", "anxiety", "stress", "sleep", "vitamin",
+            "doctor", "hospital", "medicine", "drug", "disease", "treatment",
+            "blood", "heart", "lung", "skin", "bone", "virus", "bacteria"
+        ]
+        return any(kw in text.lower() for kw in medical_keywords)
+
+    def _detect_urgency(self, text: str) -> bool:
+        """Detect emergency-level keywords requiring immediate routing."""
+        urgent_keywords = [
+            "emergency", "chest pain", "can't breathe", "fainting", "stroke",
+            "bleeding heavily", "suicidal", "unconscious", "severe allergic reaction"
+        ]
+        return any(kw in text.lower() for kw in urgent_keywords)
+
     def retrieve(self, query: str) -> list[str]:
         """Semantic search: returns top-k relevant chunks."""
         try:
@@ -81,8 +99,22 @@ class MedicalRAG:
             print(f"⚠️ Retrieval error: {e}")
             return []
 
-    def generate(self, query: str, history: list[dict] = None) -> str:
-        """Retrieve context -> Prompt LLM -> Return safe, grounded response."""
+    def generate(self, query: str, history: list[dict] = None) -> dict:
+        """Full pipeline: safety checks → retrieval → LLM generation → safe response."""
+        
+        # Domain Restriction (inside model)
+        if not self._is_medical_topic(query):
+            return {
+                "response": "I'm designed to assist with health and wellness topics only. Please ask about symptoms, conditions, nutrition, or general medical guidance.\n⚠️ Disclaimer: I am an AI assistant, not a licensed healthcare professional. This information is for educational purposes only and should not replace professional medical advice, diagnosis, or treatment.",
+                "accepted": False
+            }
+
+        # Urgency Handling (prepend emergency warning if needed)
+        prefix = ""
+        if self._detect_urgency(query):
+            prefix = "If you are experiencing a medical emergency, please call your local emergency number (e.g., 911) or go to the nearest hospital immediately.\n\n"
+
+        # Retrieve context (only for medical queries)
         context_chunks = self.retrieve(query)
         context = "\n\n---\n\n".join(context_chunks) if context_chunks else ""
 
@@ -118,6 +150,16 @@ class MedicalRAG:
             # Safety fallback: guarantee disclaimer
             if "Disclaimer" not in reply and "disclaimer" not in reply.lower():
                 reply += "\n\n⚠️ Disclaimer: I am an AI assistant, not a licensed healthcare professional. This information is for educational purposes only and should not replace professional medical advice, diagnosis, or treatment."
-            return reply
+            
+            # Prepend urgency warning if needed
+            # In model.py - generate() return:
+            return {
+                "response": prefix + reply,
+                "accepted": True  # or False if domain-rejected
+            }
+            
         except Exception as e:
-            return f"⚠️ LLM Error: {str(e)}"
+            return {
+                "response": f"⚠️ LLM Error: {str(e)}",
+                "accepted": False
+            }
