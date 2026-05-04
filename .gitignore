@@ -1,0 +1,12 @@
+#ignoring dataset
+/knowledge/medquad.csv
+
+#python cache
+/__pycache__
+
+#pictures
+*.png
+
+#pdfs and docs
+*.pdf
+*.docx
