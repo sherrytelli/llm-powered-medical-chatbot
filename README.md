@@ -2,6 +2,8 @@
 
 A responsible, domain-specific medical information assistant powered by **Retrieval-Augmented Generation (RAG)**, **Ollama**, and the **MedQuAD dataset**. Designed for educational purposes with safety-first principles.
 
+> See the **full-stack** branch for information about how to deploy this project as a full stack application
+
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
 [![Ollama](https://img.shields.io/badge/ollama-local%20LLM-orange)](https://ollama.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
