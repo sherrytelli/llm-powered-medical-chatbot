@@ -1,22 +1,179 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom theme with proper OKLCH color format */
+@theme {
+  --color-background: oklch(0.98 0.003 247.86);
+  --color-foreground: oklch(0.15 0.02 264.66);
+  --color-card: oklch(1.00 0.00 0);
+  --color-card-foreground: oklch(0.15 0.02 264.66);
+  --color-primary: oklch(0.55 0.20 256.52);
+  --color-primary-foreground: oklch(0.98 0.003 247.86);
+  --color-secondary: oklch(0.95 0.005 247.86);
+  --color-secondary-foreground: oklch(0.20 0.02 264.66);
+  --color-muted: oklch(0.95 0.005 247.86);
+  --color-muted-foreground: oklch(0.55 0.02 264.66);
+  --color-accent: oklch(0.95 0.005 247.86);
+  --color-accent-foreground: oklch(0.20 0.02 264.66);
+  --color-border: oklch(0.90 0.005 247.86);
+  --color-ring: oklch(0.55 0.20 256.52);
+  --color-success: oklch(0.55 0.20 142.48);
+  --color-success-foreground: oklch(0.98 0.003 247.86);
+  --color-warning: oklch(0.75 0.18 85.58);
+  --color-warning-foreground: oklch(0.20 0.02 264.66);
+  --color-error: oklch(0.55 0.22 15.31);
+  --color-error-foreground: oklch(0.98 0.003 247.86);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark mode theme */
+@theme dark {
+  --color-background: oklch(0.15 0.02 264.66);
+  --color-foreground: oklch(0.98 0.003 247.86);
+  --color-card: oklch(0.18 0.02 264.66);
+  --color-card-foreground: oklch(0.98 0.003 247.86);
+  --color-primary: oklch(0.65 0.22 256.52);
+  --color-primary-foreground: oklch(0.15 0.02 264.66);
+  --color-secondary: oklch(0.25 0.02 264.66);
+  --color-secondary-foreground: oklch(0.98 0.003 247.86);
+  --color-muted: oklch(0.25 0.02 264.66);
+  --color-muted-foreground: oklch(0.65 0.02 264.66);
+  --color-accent: oklch(0.25 0.02 264.66);
+  --color-accent-foreground: oklch(0.98 0.003 247.86);
+  --color-border: oklch(0.25 0.02 264.66);
+  --color-ring: oklch(0.65 0.22 256.52);
+  --color-success: oklch(0.60 0.22 142.48);
+  --color-success-foreground: oklch(0.15 0.02 264.66);
+  --color-warning: oklch(0.70 0.18 85.58);
+  --color-warning-foreground: oklch(0.98 0.003 247.86);
+  --color-error: oklch(0.60 0.24 15.31);
+  --color-error-foreground: oklch(0.98 0.003 247.86);
 }
 
+/* Base styles */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  @apply bg-background text-foreground;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Custom utilities */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass {
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Chat bubble styles */
+.chat-bubble {
+  position: relative;
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin: 8px 0;
+}
+
+.chat-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.chat-bubble.user::before {
+  right: -10px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.chat-bubble.assistant::before {
+  left: -10px;
+  transform: rotate(-135deg);
+  background: white;
+}
+
+.dark .chat-bubble.assistant::before {
+  background: #1f2937;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ensure high contrast for all text */
+.text-foreground {
+  @apply text-gray-900 dark:text-white;
+}
+
+.text-muted-foreground {
+  @apply text-gray-600 dark:text-gray-300;
 }
 
